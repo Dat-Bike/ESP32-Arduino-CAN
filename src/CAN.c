@@ -65,7 +65,7 @@ static void CAN_isr(void *arg_p) {
 	if ((interrupt & __CAN_IRQ_RX) != 0)
 		CAN_read_frame_phy(&higherPriorityTaskWoken);
 
-	int canInterruptErrorCode = (interrupt & (__CAN_IRQ_TX | __CAN_IRQ_ERR  // 0x4
+	canInterruptErrorCode = (interrupt & (__CAN_IRQ_TX | __CAN_IRQ_ERR  // 0x4
                                             | __CAN_IRQ_DATA_OVERRUN      // 0x8
                                             | __CAN_IRQ_WAKEUP            // 0x10
                                             | __CAN_IRQ_ERR_PASSIVE       // 0x20
