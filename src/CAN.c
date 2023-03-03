@@ -50,6 +50,7 @@ static void CAN_read_frame_phy();
 static void CAN_isr(void *arg_p);
 static int CAN_write_frame_phy(const CAN_frame_t *p_frame);
 static SemaphoreHandle_t sem_tx_complete;
+static int canInterruptErrorCode;
 
 static void CAN_isr(void *arg_p) {
 
@@ -64,15 +65,16 @@ static void CAN_isr(void *arg_p) {
 	if ((interrupt & __CAN_IRQ_RX) != 0)
 		CAN_read_frame_phy(&higherPriorityTaskWoken);
 
-	// Handle TX complete interrupt
-	// Handle error interrupts.
-	if ((interrupt & (__CAN_IRQ_TX | __CAN_IRQ_ERR //0x4
-	                  | __CAN_IRQ_DATA_OVERRUN     // 0x8
-	                  | __CAN_IRQ_WAKEUP           // 0x10
-	                  | __CAN_IRQ_ERR_PASSIVE      // 0x20
-	                  | __CAN_IRQ_ARB_LOST         // 0x40
-	                  | __CAN_IRQ_BUS_ERR          // 0x80
-	                  )) != 0) {
+	int canInterruptErrorCode = (interrupt & (__CAN_IRQ_TX | __CAN_IRQ_ERR  // 0x4
+                                            | __CAN_IRQ_DATA_OVERRUN      // 0x8
+                                            | __CAN_IRQ_WAKEUP            // 0x10
+                                            | __CAN_IRQ_ERR_PASSIVE       // 0x20
+                                            | __CAN_IRQ_ARB_LOST          // 0x40
+                                            | __CAN_IRQ_BUS_ERR           // 0x80
+                                            ));
+  // Handle TX complete interrupt
+  // Handle error interrupts.
+  if (canInterruptErrorCode != 0) {
 		if (((interrupt & __CAN_IRQ_ERR) != 0) && (MODULE_CAN->TXERR.U > 127)) {
 			// Abort transmission
 			MODULE_CAN->CMR.B.AT = 1;
@@ -308,4 +310,8 @@ int CAN_config_filter(const CAN_filter_t* p_filter) {
     __filter.AMR3 = p_filter->AMR3;
 	
 	return 0;
+}
+
+int CAN_error_read() {
+	return canInterruptErrorCode;
 }

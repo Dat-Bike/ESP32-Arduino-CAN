@@ -16,5 +16,7 @@ int ESP32CAN::CANConfigFilter(const CAN_filter_t* p_filter)
 {
     return CAN_config_filter(p_filter);
 }
-
+int ESP32CAN::CANErrorRead() {
+  return CAN_error_read();
+}
 ESP32CAN ESP32Can;
