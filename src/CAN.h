@@ -123,6 +123,7 @@ int CAN_stop(void);
  */
 int CAN_config_filter(const CAN_filter_t* p_filter);
 
+int CAN_error_read();
 
 #ifdef __cplusplus
 }
